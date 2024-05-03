@@ -13,7 +13,7 @@ pipeline {
         stage('Install Docker Compose') {
             steps {
                 script {
-                    sh 'command -v docker-compose || (sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose && sudo chmod +x /usr/local/bin/docker-compose)'
+                    sh 'command -v docker-compose || (sudo curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-Linux-x86_64 -o /usr/local/bin/docker-compose && sudo chmod +x /usr/local/bin/docker-compose)'
                 }
             }
         }
@@ -21,7 +21,12 @@ pipeline {
         stage('Install jq') {
             steps {
                 script {
-                    sh 'command -v jq || sudo apt-get update && sudo apt-get install -y jq'
+                    def jqInstalled = sh(script: 'command -v jq', returnStatus: true) == 0
+                    if (!jqInstalled) {
+                        sh 'sudo apt-get update && sudo apt-get install -y jq'
+                    } else {
+                        echo "jq is already installed."
+                    }
                 }
             }
         }
